@@ -5,12 +5,20 @@ echo "-----> Installing Ghostscript 9.10"
 
 BUILD_DIR=$1
 PACKAGE="http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz"
-LOCATION="$BUILD_DIR/vendor/gs"
 
 mkdir -p $LOCATION
-curl $PACKAGE -s -o - | tar xzf - -C $LOCATION
+curl -O $PACKAGE -s
 
 echo "-----> Building runtime environment for Ghostscript"
 
-mkdir -p $BUILD_DIR/.profile.d
-echo "export PATH=\"\$HOME/vendor/gs/bin:\$PATH\"" > $BUILD_DIR/.profile.d/ghostscript.sh
+tar xzvf ghostscript-9.05.tar.gz
+cd ghostscript-9.05
+./configure --disable-cups --disable-gtk --with-drivers=FILES
+make
+cp bin/gs ~/bin
+
+echo "Ghostscript version:"
+echo gs --version
+
+cd ~
+rm -rf ghostscript-9.05*
