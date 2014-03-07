@@ -4,7 +4,7 @@
 echo "-----> Installing Ghostscript 9.10"
 
 BUILD_DIR=$1
-PACKAGE="https://elbongurk-public.s3.amazonaws.com/ghostscript.tgz"
+PACKAGE="http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz"
 LOCATION="$BUILD_DIR/vendor/gs"
 
 mkdir -p $LOCATION
