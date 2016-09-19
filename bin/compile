@@ -3,9 +3,7 @@
 indent() {
   sed -u 's/^/       /'
 }
-echo "----->"
-echo $BMW_ENDPOINT
-echo "----->"
+
 
 echo "-----> Installing Ghostscript"
 
@@ -35,7 +33,7 @@ if [ ! -f $CACHE_FILE ]; then
     ls $BUILD_DIR | indent
     exit 1;
   fi
-  tar xzvf $BUILD_DIR/$GS_FILE | indent
+  tar -xzvf $BUILD_DIR/$GS_FILE | indent
 
   echo "-----> Building Ghostscript"
   cd $GS_DIR
@@ -49,17 +47,16 @@ if [ ! -f $CACHE_FILE ]; then
   echo "-----> Caching Ghostscript installation"
   cd $VENDOR_DIR
   REL_INSTALL_DIR="ghostscript"
-  tar zxvf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
-  mv $REL_INSTALL_DIR.tar.xz $CACHE_FILE
+  tar -zcvf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
+  mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
 
 else
   # cache exists, extract it
   echo "-----> Extracting Ghostscript $CACHE_FILE => $VENDOR_DIR"
-  tar xzvf $CACHE_FILE -C $VENDOR_DIR
+  tar -xzvf $CACHE_FILE -C $VENDOR_DIR
 fi
 
 
-# update PATH and LD_LIBRARY_PATH
+# update PATH
 echo "-----> Updating environment variables"
-ACTUAL_INSTALL_PATH="$HOME/vendor/ghostscript"
-echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH"
+echo "export PATH=INSTALL_DIR/bin:\$PATH"
