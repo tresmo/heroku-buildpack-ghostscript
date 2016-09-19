@@ -4,24 +4,39 @@ indent() {
   sed -u 's/^/       /'
 }
 
-
-echo "-----> Installing Ghostscript"
-
 BUILD_DIR=$1
 CACHE_DIR=$2
+ENV_DIR=$3
 VENDOR_DIR="$BUILD_DIR/vendor"
-INSTALL_DIR="$VENDOR_DIR/ghostscript"
-
-mkdir -p $INSTALL_DIR
 mkdir -p $CACHE_DIR
 
-GS_VERSION="9.14"
-CACHE_FILE="$CACHE_DIR/ghostscript-$GS_VERSION.tar.gz"
+export_env_dir() {
+  whitelist_regex=${2:-''}
+  blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+  if [ -d "$ENV_DIR" ]; then
+    for e in $(ls $ENV_DIR); do
+      echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+      export "$e=$(cat $ENV_DIR/$e)"
+      :
+    done
+  fi
+}
+
+export_env_dir
+
+GS_INSTALL_VERSION="${GHOSTSCRIPT_VERSION:-9.14}"
+
+echo "-----> Installing Ghostscript $GS_INSTALL_VERSION"
+INSTALL_DIR="$VENDOR_DIR/ghostscript"
+mkdir -p $INSTALL_DIR
+
+
+CACHE_FILE="$CACHE_DIR/ghostscript-$GS_INSTALL_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ]; then
-  # install gs
-  GS_FILE="ghostscript-$GS_VERSION.tar.gz"
-  GS_DIR="ghostscript-$GS_VERSION"
+
+  GS_FILE="ghostscript-$GS_INSTALL_VERSION.tar.gz"
+  GS_DIR="ghostscript-$GS_INSTALL_VERSION"
   GS_URL="http://downloads.ghostscript.com/public/old-gs-releases/$GS_FILE"
 
   echo "-----> Downloading Ghostscript from $GS_URL"
@@ -39,7 +54,7 @@ if [ ! -f $CACHE_FILE ]; then
   cd $GS_DIR
 
   ./configure --disable-cups --disable-gtk --with-drivers=FILES  --prefix=$INSTALL_DIR
-  make
+  make && make install
   cd ..
   rm -rf $GS_DIR
 
@@ -59,4 +74,6 @@ fi
 
 # update PATH
 echo "-----> Updating environment variables"
-echo "export PATH=INSTALL_DIR/bin:\$PATH"
+PROFILE_PATH="$BUILD_DIR/.profile.d/ghostscript.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+echo "export PATH=$INSTALL_DIR/bin:\$PATH" >> $PROFILE_PATH
