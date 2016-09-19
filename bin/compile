@@ -3,21 +3,22 @@
 indent() {
   sed -u 's/^/       /'
 }
-
+echo "----->"
 echo $BMW_ENDPOINT
+echo "----->"
 
 echo "-----> Installing Ghostscript"
 
 BUILD_DIR=$1
 CACHE_DIR=$2
-mkdir -p $CACHE_DIR
 VENDOR_DIR="$BUILD_DIR/vendor"
-mkdir -p $VENDOR_DIR
-INSTALL_DIR="$VENDOR_DIR/gs"
-mkdir -p $INSTALL_DIR
-GS_VERSION="9.14"
-CACHE_FILE="$CACHE_DIR/gs-GS_VERSION.tar.gz"
+INSTALL_DIR="$VENDOR_DIR/ghostscript"
 
+mkdir -p $INSTALL_DIR
+mkdir -p $CACHE_DIR
+
+GS_VERSION="9.14"
+CACHE_FILE="$CACHE_DIR/ghostscript-$GS_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ]; then
   # install gs
@@ -39,7 +40,7 @@ if [ ! -f $CACHE_FILE ]; then
   echo "-----> Building Ghostscript"
   cd $GS_DIR
 
-  ./configure --disable-cups --disable-gtk --with-drivers=FILES
+  ./configure --disable-cups --disable-gtk --with-drivers=FILES  --prefix=$INSTALL_DIR
   make
   cd ..
   rm -rf $GS_DIR
