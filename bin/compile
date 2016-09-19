@@ -4,6 +4,8 @@ indent() {
   sed -u 's/^/       /'
 }
 
+echo $BMW_ENDPOINT
+
 echo "-----> Installing Ghostscript"
 
 BUILD_DIR=$1
