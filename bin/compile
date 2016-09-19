@@ -1,24 +1,62 @@
-#!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir>
+#!/bin/bash
 
-echo "-----> Installing Ghostscript 9.14"
+indent() {
+  sed -u 's/^/       /'
+}
+
+echo "-----> Installing Ghostscript"
 
 BUILD_DIR=$1
-PACKAGE="http://downloads.ghostscript.com/public/old-gs-releases/ghostscript-9.14.tar.gz"
+CACHE_DIR=$2
+mkdir -p $CACHE_DIR
+VENDOR_DIR="$BUILD_DIR/vendor"
+mkdir -p $VENDOR_DIR
+INSTALL_DIR="$VENDOR_DIR/gs"
+mkdir -p $INSTALL_DIR
+GS_VERSION="9.14"
+CACHE_FILE="$CACHE_DIR/gs-GS_VERSION.tar.gz"
 
-mkdir -p $LOCATION
-curl -O $PACKAGE -s
 
-echo "-----> Building runtime environment for Ghostscript"
+if [ ! -f $CACHE_FILE ]; then
+  # install gs
+  GS_FILE="ghostscript-$GS_VERSION.tar.gz"
+  GS_DIR="ghostscript-$GS_VERSION"
+  GS_URL="http://downloads.ghostscript.com/public/old-gs-releases/$GS_FILE"
 
-tar xzvf ghostscript-9.14.tar.gz
-cd ghostscript-9.14
-./configure --disable-cups --disable-gtk --with-drivers=FILES
-make
-cp bin/gs ~/bin
+  echo "-----> Downloading Ghostscript from $GS_URL"
+  wget $GS_URL -P $BUILD_DIR | indent
 
-echo "Ghostscript version:"
-echo gs --version
+  echo "-----> Extracting Ghostscript from $BUILD_DIR/$GS_FILE"
+  if [ ! -f $BUILD_DIR/$GS_FILE ]; then
+    echo "Error: Unable to download Ghostscript" | indent
+    ls $BUILD_DIR | indent
+    exit 1;
+  fi
+  tar xzvf $BUILD_DIR/$GS_FILE | indent
 
-cd ~
-rm -rf ghostscript-9.14*
+  echo "-----> Building Ghostscript"
+  cd $GS_DIR
+
+  ./configure --disable-cups --disable-gtk --with-drivers=FILES
+  make
+  cd ..
+  rm -rf $GS_DIR
+
+  # cache for future deploys
+  echo "-----> Caching Ghostscript installation"
+  cd $VENDOR_DIR
+  REL_INSTALL_DIR="ghostscript"
+  tar zxvf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
+  mv $REL_INSTALL_DIR.tar.xz $CACHE_FILE
+
+else
+  # cache exists, extract it
+  echo "-----> Extracting Ghostscript $CACHE_FILE => $VENDOR_DIR"
+  tar xzvf $CACHE_FILE -C $VENDOR_DIR
+fi
+
+
+# update PATH and LD_LIBRARY_PATH
+echo "-----> Updating environment variables"
+ACTUAL_INSTALL_PATH="$HOME/vendor/ghostscript"
+echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH"
