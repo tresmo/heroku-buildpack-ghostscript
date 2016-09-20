@@ -48,7 +48,7 @@ if [ ! -f $CACHE_FILE ]; then
     ls $BUILD_DIR | indent
     exit 1;
   fi
-  tar -xzvf $BUILD_DIR/$GS_FILE | indent
+  tar -xzf $BUILD_DIR/$GS_FILE | indent
 
   echo "-----> Building Ghostscript"
   cd $GS_DIR
@@ -62,13 +62,13 @@ if [ ! -f $CACHE_FILE ]; then
   echo "-----> Caching Ghostscript installation"
   cd $VENDOR_DIR
   REL_INSTALL_DIR="ghostscript"
-  tar -zcvf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
+  tar -zcf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
   mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
 
 else
   # cache exists, extract it
   echo "-----> Extracting Ghostscript $CACHE_FILE => $VENDOR_DIR"
-  tar -xzvf $CACHE_FILE -C $VENDOR_DIR
+  tar -xzf $CACHE_FILE -C $VENDOR_DIR
 fi
 
 
