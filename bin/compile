@@ -77,4 +77,4 @@ echo "-----> Updating environment variables"
 PROFILE_PATH="$BUILD_DIR/.profile.d/ghostscript.sh"
 ACTUAL_INSTALL_PATH="$HOME/vendor/ghostscript"
 mkdir -p $(dirname $PROFILE_PATH)
-echo "export PATH=ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
+echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
