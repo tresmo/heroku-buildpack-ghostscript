@@ -35,9 +35,10 @@ CACHE_FILE="$CACHE_DIR/ghostscript-$GS_INSTALL_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ]; then
 
-  GS_FILE="ghostscript-$GS_INSTALL_VERSION.tar.gz"
-  GS_DIR="ghostscript-$GS_INSTALL_VERSION"
-  GS_URL="http://downloads.ghostscript.com/public/old-gs-releases/$GS_FILE"
+  GS_FILE="ghostscript-9.25.tar.gz"
+  GS_DIR="ghostscript-9.25"
+  # GS_URL="http://downloads.ghostscript.com/public/old-gs-releases/$GS_FILE"
+  GS_URL="https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs925/ghostscript-9.25.tar.gz"
 
   echo "-----> Downloading Ghostscript from $GS_URL"
   wget $GS_URL -P $BUILD_DIR | indent
